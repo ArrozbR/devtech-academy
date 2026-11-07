@@ -11,6 +11,8 @@ const btnCancelar = document.getElementById("btnCancelar");
 const tituloFormulario = document.getElementById("tituloFormulario");
 const tabela = document.getElementById("tabelaAlunos");
 const mensagemVazia = document.getElementById("mensagemVazia");
+const tituloRelatorio = document.getElementById("tituloRelatorio");
+const resultadoRelatorio = document.getElementById("resultadoRelatorio");
 
 const lerFormulario = () => new Aluno(
     campoNome.value.trim(),
@@ -110,6 +112,58 @@ const excluirAluno = (indice) => {
     renderizarTabela();
 };
 
+const mostrarRelatorio = (titulo, linhas) => {
+    tituloRelatorio.textContent = titulo;
+    resultadoRelatorio.innerHTML = "";
+
+    const itens = linhas.length > 0 ? linhas : ["Nenhum dado para exibir."];
+    itens.forEach((linha) => {
+        const li = document.createElement("li");
+        li.textContent = linha;
+        resultadoRelatorio.appendChild(li);
+    });
+};
+
+const calcularMedia = (valores) =>
+    valores.length === 0 ? 0 : valores.reduce((soma, valor) => soma + valor, 0) / valores.length;
+
+const relatorioAprovados = () => {
+    const aprovados = alunos
+        .filter((aluno) => aluno.isAprovado())
+        .map((aluno) => aluno.toString());
+    mostrarRelatorio(`Alunos aprovados (${aprovados.length})`, aprovados);
+};
+
+const relatorioMediaNotas = () => {
+    const media = calcularMedia(alunos.map((aluno) => aluno.notaFinal));
+    mostrarRelatorio("Média das notas finais", alunos.length ? [media.toFixed(2)] : []);
+};
+
+const relatorioMediaIdades = () => {
+    const media = calcularMedia(alunos.map((aluno) => aluno.idade));
+    mostrarRelatorio("Média das idades", alunos.length ? [`${media.toFixed(1)} anos`] : []);
+};
+
+const relatorioOrdemAlfabetica = () => {
+    const nomes = alunos
+        .map((aluno) => aluno.nome)
+        .sort((a, b) => a.localeCompare(b, "pt-BR"));
+    mostrarRelatorio("Nomes em ordem alfabética", nomes);
+};
+
+const relatorioPorCurso = () => {
+    const contagem = alunos.reduce((acc, aluno) => {
+        acc[aluno.curso] = (acc[aluno.curso] || 0) + 1;
+        return acc;
+    }, { JavaScript: 0, Python: 0, Java: 0 });
+
+    const linhas = [];
+    Object.entries(contagem).forEach(([curso, quantidade]) => {
+        linhas.push(`${curso}: ${quantidade} aluno(s)`);
+    });
+    mostrarRelatorio("Quantidade de alunos por curso", alunos.length ? linhas : []);
+};
+
 form.addEventListener("submit", function (evento) {
     evento.preventDefault();
     salvarAluno();
@@ -118,6 +172,22 @@ form.addEventListener("submit", function (evento) {
 btnCancelar.addEventListener("click", function () {
     limparFormulario();
     console.log("Edição cancelada");
+});
+
+document.getElementById("btnAprovados").addEventListener("click", function () {
+    relatorioAprovados();
+});
+document.getElementById("btnMediaNotas").addEventListener("click", function () {
+    relatorioMediaNotas();
+});
+document.getElementById("btnMediaIdades").addEventListener("click", function () {
+    relatorioMediaIdades();
+});
+document.getElementById("btnOrdemAlfabetica").addEventListener("click", function () {
+    relatorioOrdemAlfabetica();
+});
+document.getElementById("btnPorCurso").addEventListener("click", function () {
+    relatorioPorCurso();
 });
 
 renderizarTabela();
