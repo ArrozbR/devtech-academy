@@ -12,17 +12,14 @@ function salvarAluno() {
         return;
     }
 
-    var aluno = {
-        nome: nome,
-        idade: Number(idade),
-        curso: curso,
-        notaFinal: Number(notaFinal)
-    };
+    var aluno = new Aluno(nome, Number(idade), curso, Number(notaFinal));
 
     if (indiceEdicao === null) {
         alunos.push(aluno);
+        console.log("Cadastrado: " + aluno.toString());
     } else {
         alunos[indiceEdicao] = aluno;
+        console.log("Atualizado: " + aluno.toString());
     }
 
     limparFormulario();
@@ -76,6 +73,7 @@ function renderizarTabela() {
         tr.appendChild(criarCelula(aluno.idade));
         tr.appendChild(criarCelula(aluno.curso));
         tr.appendChild(criarCelula(aluno.notaFinal.toFixed(1)));
+        tr.appendChild(criarCelula(aluno.isAprovado() ? "Aprovado" : "Reprovado"));
 
         var acoes = document.createElement("td");
         acoes.innerHTML =
